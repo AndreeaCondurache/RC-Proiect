@@ -1,0 +1,93 @@
+# Complet
+# Compilat
+from IPAddr import *
+class CampAddr():
+    def __init__(self, _ipAddr, _mask):
+        self.nrSNetV= []
+        ip= []
+        negMask= []
+        nrSNet=0 #numar de subretele
+        for y in _ipAddr.split('.'):
+            ip.append(int(y)) # separ ip de puncte si pun in vect ip
+        for y in _mask.split('.'):
+            negMask.append(255-int(y)) #calculez negatul mastii
+        for i in range(0,4):
+            if negMask[i]!=0:
+                nrSNet+=negMask[i]*pow(2,8*(3-i))
+        #construim vectorul cu adresele ip disponibile
+
+        for i in range(1,nrSNet):
+            ip[3]+=1
+            if ip[3]>255:
+                ip[3]=0
+                i[2]+=1
+                if ip[2]>255:
+                    ip[2]=0
+                    ip[1]+=1
+                    if ip[1]>255:
+                        ip[1]=0
+                        ip[0]+=1
+            self.nrSNetV.append(IPAddr(str(ip[0])+'.'+str(ip[1])+'.'+str(ip[2])+'.'+str(ip[3])))
+        #functia de alocare a addr ip
+        def getFreeAddr(self, _mac):
+            ip=0
+            for x in self.nrSNetV:
+                if x.liber==1 and x.hold !=1:
+                    x.holdAddr()
+                    x.setMac(_mac)
+                    ip=x
+                    break
+            return ip
+
+        #functie apelata daca clintul doreste acea adddr
+        def setAddrLock(self, _mac):
+            for x in self.nrSNetV:
+                if x.mac==_mac:
+                    x.setAddr()
+                    break
+        #functie apelata in caz de lease time expira sau clientul trimite mesajul DHCPRELEASE
+        def ResetAddrLock(self,_mac):
+            for x in self.nrSNetV:
+                if x.mac==_mac:
+                    x.ResetAddr()
+                    break
+        # functie apelata in caz de adresa ip atribuita initial nu este validata de client
+        # si astfel o facem disponibila pentru alte atribuiri
+        def setAddrNerezervata(self, _mac):
+            for x in self.nrSNetV:
+                if x.mac==_mac:
+                    x.realeaseAddr()
+                    x.setMac("")
+                    break
+         #functie de cautare a unei addr mac
+        def findAddrMAC(self, _mac):
+            ip=0
+            for x in self.nrSNetV:
+                if x.mac==_mac:
+                    ip=x
+            return ip
+        #functie de cautare pentru addr ip
+        def findAddrIp(self,_ip):
+            ip=0
+            for x in self.nrSNetV:
+                if x.ip==_ip:
+                    ip=x.ip
+                    break
+            if ip==0:
+                print(" \n Nu exista adrasa IP cautata! ")
+                pass
+            return ip
+
+        def findOldAddr(self, _oldmac):
+            ip=0
+            for x in self.nrSNetV:
+                if x.oldmac==_oldmac:
+                    ip=x
+                    break
+            return ip
+
+
+
+
+
+

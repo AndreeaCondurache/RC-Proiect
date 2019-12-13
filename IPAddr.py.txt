@@ -1,0 +1,26 @@
+# Complet
+# Compilat
+class IPAddr():
+    def __init__(self,_ip):
+        self.ip=_ip
+        self.mac=""
+        self.oldmac=""
+        self.leaseT=5000 #timpul de inchiriere
+        self.liber=1
+        self.hold=0;
+        self.options={}
+    def setMac(self,_mac):
+        self.mac=_mac
+    def setAddr(self):
+        self.liber=0
+    def holdAddr(self):
+        self.hold=1
+    def ResetAddr(self):
+        self.liber=1
+        self.oldmac=self.mac
+    def realeaseAddr(self):
+        self.hold=0
+    def SetLeaseT(self, _leaseT):
+        self.leaseT=_leaseT
+
+

@@ -1,0 +1,105 @@
+# Complet
+# Compilat
+class Options:
+    DHCPMsgType={1: "DHCPDISCOVER",
+        2: "DHCPOFFER",
+        3: "DHCPREQUEST",
+        4: "DHCPDECLINE",
+        5: "DHCPACK",
+        6: "DHCPNAK",
+        7: "DHCPRELEASE",
+        8: "DHCPINFORM"
+    }
+
+    def __init__(self, _options):
+        self.options = _options
+        self.OptionsData = {
+            1: "Empty",
+            3: "Empty",
+            6: "Empty",
+            15: "Empty",
+            28: "Empty",
+            53: "Empty",
+            54: "Empty",
+            58: "Empty"
+        }
+    def optSplit(self):
+        idx=2; #index
+        if self.options=="":
+            print("Nu exista optiune validata data")
+        else:
+            while idx<len(self.options):
+                code=int(self.options[idx-2:idx], base=10)
+                len=int(self.options[idx:idx+2],base=10)*2 #length
+                if code !=1 and code!=3 and code!=6 and code !=15 and code!=28 and code!=53 and code!=54 and code!=58:
+                    print("Optiunea selectata este invalida!")
+                self.optionsData[code]=self.options[idx+2:idx+2+len]
+                idx+=len+6
+            self.OptDec() #decodare optiune
+    def ipAddrFormat(self,addr):
+        if len(addr)!=8:
+            return "INVALID (IP INVALID)"
+        else:
+            newAddr="%d.%d.%d.%d" % (int(addr[0:2], base=16), int(addr[2:4], base=16), int(addr[4:6], base=16),int(addr[6:8], base=16))
+            return newAddr
+    def nameFormat(self,name):
+        if len(name)==0:
+            return "INVALID (NUMELE ESTE INVALID)"
+        else:
+            newName=""
+            s=0 #start
+            e=2 #end
+            while e<=len(name):
+                newName+=chr(int(name[s:e],base=26))
+                s=e
+                e+=2
+            return newName
+    def OptDec(self):
+        for i in self.OptionsData:
+            if self.OptionsData[i]!="Empty":
+                #subnet mask
+                if i==1:
+                    self.OptionsData[i]=self.ipAddrFormat(self.OptionsData[i])
+                #router
+                if i==3:
+                    aux=""
+                    s=0 #start
+                    e=0 #end
+                    opLen=len(self.OptionsData[i])
+                    while e<opLen:
+                        aux+=self.ipAddrFormat(self.OptionsData[i][s:e])
+                        if e!=opLen:
+                            aux+=","
+                            s=e
+                            s+=8
+                    self.OptionsData[i]=aux
+                    #domain name server op
+                    if i==6:
+                        aux=""
+                        s=0 #start
+                        e=8 #end
+                        opLen=len(self.OptionsData[i])
+                        while e<=opLen:
+                            aux+=self.ipAddrFormat(self.OptionsData[i][s:e])
+                            if e!=opLen:
+                                aux+=","
+                                s=e
+                                e+=8
+                        self.OptionsData[i]=aux
+
+                    #domain name
+                    if i==15:
+                        self.OptionsData[i]=self.nameFormat(self.OptionsData[i])
+
+                    ##Broadcast Address Option
+                    if i==28:
+                        self.OptionsData[i]=self.ipAddrFormat(self.OptionsData[i])
+                    # DHCP Message Type
+                    if i==53:
+                        self.OptionsData[i]=self.DHCPMsgType[int(self.OptionsData[i],base=10)]
+                    # Server Identifier
+                    if i==54:
+                        self.OptionsData[i]=self.ipAddrFormat(self.OptionsData[i])
+                    # Renewal (T1) Time Value
+                    if i==58:
+                        self.OptionsData[i]=int(self.OptionsData[i], base=16)
